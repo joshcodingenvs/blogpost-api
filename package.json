@@ -9,14 +9,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/joshcodingenv/blogpost-api-nodejs.git"
+    "url": "git+https://github.com/joshcodingenv/blogpost-api.git"
   },
   "author": "joshcodingenv",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/joshcodingenv/blogpost-api-nodejs/issues"
+    "url": "https://github.com/joshcodingenv/blogpost-api/issues"
   },
-  "homepage": "https://github.com/joshcodingenv/blogpost-api-nodejs#readme",
+  "homepage": "https://github.com/joshcodingenv/blogpost-api#readme",
   "dependencies": {
     "bcrypt": "^5.1.0",
     "body-parser": "^1.20.2",
