@@ -137,7 +137,7 @@ router.post("/login", async (req, res) => {
             httpOnly: true
         }).send("Logged In");
 
-    } else if(email){
+    } else if (email) {
         if (!email || email.length === 0 || email === "") {
             return res.status(400).send("Username is required");
         };
@@ -170,7 +170,7 @@ router.post("/login", async (req, res) => {
     };
 })
 
-router.put("/edit/user/:userId", AuthedUser, async (req, res)=>{
+router.put("/edit/user/:userId", AuthedUser, async (req, res) => {
     // object destructuring to obtain the submitted user values in the request body
     const { username, email, firstName, lastName } = req.body;
 
@@ -179,7 +179,7 @@ router.put("/edit/user/:userId", AuthedUser, async (req, res)=>{
 
     // check user existence based on requested Id
     const existingUser = await User.findById(userId);
-    if(!existingUser){
+    if (!existingUser) {
         return res.status(403).send("Unauthorized");
     }
 
@@ -199,9 +199,9 @@ router.put("/edit/user/:userId", AuthedUser, async (req, res)=>{
 
     // check the logged In user Id
     // console.log(signedUserByUsername._id.toString(), signedUserByEmail._id.toString());
-    
+
     // make some edits based on data submitted and user validity
-    if(userId === existingUserId){
+    if (userId === existingUserId) {
         // print true if the id is the same, an earlier validation line
         //console.log(true);
 
@@ -218,19 +218,41 @@ router.put("/edit/user/:userId", AuthedUser, async (req, res)=>{
         // update the user
         const userUpdated = await User.findByIdAndUpdate(userId, userUpdates, { strict: true });
         res.status(201).send("User updated");
-    }else{
+    } else {
         return res.status(403).send("Forbidden");
-    };        
+    };
 });
 
-router.get("/logout", (req, res)=>{
+router.delete("/delete/user/:userId", AuthedUser, async (req, res) => {
+    // get the requested user id
+    const userId = req.params.userId;
+
+    // check if the singed user is the user requesting the deletion
+    const signedUserId = req.user_id;
+    if (userId === signedUserId) {
+
+        // check user existence before deletion
+        const existingUser = await User.findById(userId);
+        if (existingUser) {
+            // delete the user if exists
+            await User.findByIdAndDelete(userId);
+
+            res.status(200).send("User deleted");
+        } else {
+            return res.status(403).send("Forbidden");
+        };
+    }else{
+        return res.status(403).send("Forbidden");
+    }
+})
+
+router.get("/logout", (req, res) => {
     // clear the token value to make user logged out
-    res.cookie("token", "",{
+    res.cookie("token", "", {
         httpOnly: true,
         expires: new Date(0),
     }).send("Logged Out");
 });
-
 
 // export router instance
 module.exports = router;
