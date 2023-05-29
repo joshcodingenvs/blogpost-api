@@ -27,11 +27,7 @@ const postSchema = new mongoose.Schema({
         body: {
             type: String,
             required: true
-        },
-        img: {
-            type: Buffer,
-            contentType: String
-        },
+        },        
         date: {
             type: Date,
             default: Date.now
