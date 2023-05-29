@@ -69,7 +69,6 @@ router.post("/new-post",AuthedUser, async (req, res)=>{
     res.status(201).send("New post created");
 });
 
-
 router.put("/edit/post/:postId",AuthedUser, async (req, res)=>{
     // get requested post
     const postId = req.params.postId;
@@ -111,7 +110,7 @@ router.put("/edit/post/:postId",AuthedUser, async (req, res)=>{
     };
 });
 
-router.delete("/edit/post/:postId",AuthedUser, async (req, res)=>{
+router.delete("/delete/post/:postId",AuthedUser, async (req, res)=>{
     // get requested post
     const postId = req.params.postId;
 
