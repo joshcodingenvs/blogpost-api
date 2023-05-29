@@ -5,6 +5,9 @@ const slugify = require("slugify");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
+// import middleware's
+const AuthedUser = require("../middlewares/authedUser");
+
 // router instance
 const router = express.Router();
 
@@ -13,7 +16,7 @@ router.get("/users/test", (req, res) => {
     res.status(200).send("Test route handler working");
 });
 
-router.get("/users", async (req, res) => {
+router.get("/users", AuthedUser, async (req, res) => {
     // retrieve all users from the database
     const users = await User.find({});
     if (!users) {
@@ -26,7 +29,7 @@ router.get("/users", async (req, res) => {
     res.status(200).json({ users });
 });
 
-router.get("/user/:username", async (req, res) => {
+router.get("/user/:username", AuthedUser, async (req, res) => {
     // get requested username
     const username = req.params.username;
 
@@ -167,10 +170,57 @@ router.post("/login", async (req, res) => {
     };
 })
 
-router.put("/edit/user/:userId", async (req, res)=>{
+router.put("/edit/user/:userId", AuthedUser, async (req, res)=>{
     // object destructuring to obtain the submitted user values in the request body
     const { username, email, firstName, lastName } = req.body;
-        
+
+    // get user requested id
+    const userId = req.params.userId;
+
+    // check user existence based on requested Id
+    const existingUser = await User.findById(userId);
+    if(!existingUser){
+        return res.status(403).send("Unauthorized");
+    }
+
+    // obtain a plain existing user id
+    const existingUserId = existingUser._id.toString();
+
+    // check user data based on means of signup, this commented code is about validations
+    // const signedUserByUsername = {
+    //     _id: req.user_id,
+    //     name: req.user_name
+    // };
+
+    // const signedUserByEmail = {
+    //     _id: req.user_id,
+    //     email: req.user_email
+    // };
+
+    // check the logged In user Id
+    // console.log(signedUserByUsername._id.toString(), signedUserByEmail._id.toString());
+    
+    // make some edits based on data submitted and user validity
+    if(userId === existingUserId){
+        // print true if the id is the same, an earlier validation line
+        //console.log(true);
+
+        // re-create some data
+        fullName = slugify(`${firstName} ${lastName}`, { lower: true });
+
+        const userUpdates = {
+            username, email, firstName, lastName, fullName
+        };
+
+        // check the data before updating the user
+        // console.log(userUpdates);
+
+        // update the user
+        const userUpdated = await User.findByIdAndUpdate(userId, userUpdates, { strict: true });
+        res.status(201).send("User updated");
+    }else{
+        return res.status(403).send("Forbidden");
+    };        
 });
 
 router.get("/logout", (req, res)=>{
